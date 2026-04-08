@@ -417,7 +417,7 @@ const ARTICLE_PATTERNS = [
     describe: () => 'Soft Starter Danfoss MCD Series'
   },
   // ABB â ACS580-01-xxxA-x, 3AUA0000xxxxxx
-  { brand: 'ABB', regex: /\b(ACS\d{3}[-]\d{2}[-]\d{2,4}[A-Z]?\d?[-][24])\b/i,
+  { brand: 'ABB', regex: /\b(ACS\d{3}[-]\d{2}[A-Z]?[-]\d{2,4}[A-Z]?\d?[-][234])\b/i,
     describe: (code) => {
       const series = code.match(/ACS(\d{3})/i);
       if (!series) return 'Inverter ABB ACS Series';
@@ -452,7 +452,7 @@ const ARTICLE_PATTERNS = [
     }
   },
   // YASKAWA â CIMR-xxxxx
-  { brand: 'Yaskawa', regex: /\b(CIMR[-]?\w{5,12})\b/i,
+  { brand: 'Yaskawa', regex: /\b(CIMR[-]?\w{5,12}|GA[57]0[A-Z]\d{3,5}[A-Z]{2,4})\b/i,
     describe: (code) => {
       if (code.match(/CIMR[-]?A/i)) return 'Yaskawa A1000 â High Performance Drive';
       if (code.match(/CIMR[-]?V/i)) return 'Yaskawa V1000 â Compact Vector Drive';
@@ -472,7 +472,7 @@ const ARTICLE_PATTERNS = [
     }
   },
   // MITSUBISHI â FR-D740-xxxxx-EC
-  { brand: 'Mitsubishi', regex: /\b(FR[-][A-Z]\d{3}[-]\d{3,5}[\w-]*)\b/i,
+  { brand: 'Mitsubishi', regex: /\b(FR[-][A-Z]\d{3}[-][\d.]{1,6}[\w-]*)\b/i,
     describe: (code) => {
       const series = code.match(/FR[-]([A-Z])\d{3}/i);
       if (!series) return 'Inverter Mitsubishi FR';
@@ -1057,15 +1057,15 @@ async function processMessage(s, text) {
   // 1b) Rileva fault code di QUALSIASI marca â manda all'AI con contesto specifico
   const multiBrandPatterns = [
     // ABB: F0001, F0102, A2010, etc.
-    { brand: 'ABB', regex: /\b[FA]\d{4}\b/i },
+    { brand: 'ABB', regex: /(?<![A-Z\d\-])[FA]\d{4}(?![A-Z\d\-])/i },
     // Siemens: F07800, A0501, F30001, etc.
-    { brand: 'Siemens', regex: /\b[FA]\d{5}\b/i },
+    { brand: 'Siemens', regex: /(?<![A-Z\d\-])[FA]\d{5}(?![A-Z\d\-])/i },
     // Schneider Altivar: InFA, OHF, OCF, ObF, etc.
     { brand: 'Schneider', regex: /\b(InFA|OHF|OCF|ObF|OSF|OLF|OLC|SOF|tnF|SLF[123]|brF|USF|PHF|CnF|EPF[12]|LFF[123])\b/i },
     // Yaskawa: A502, bb01, oC, ov, Uv, etc.
     { brand: 'Yaskawa', regex: /\b(ov|uv|oC|oH|oL|GF|SE|rr|CF|CPF\d{2}|Pgo\d|bb\d{2}|[A-Z]{2,3}\d{2,3})\b/i },
     // WEG: F070, A081, etc.
-    { brand: 'WEG', regex: /\b[FA]\d{3}\b/i },
+    { brand: 'WEG', regex: /(?<![A-Z\d\-])[FA]\d{3}(?![A-Z\d\-])/i },
     // Mitsubishi: E.OC1, E.OC2, E.OV1, etc.
     { brand: 'Mitsubishi', regex: /\bE\.\w{2,4}\b/i },
     // Generico: codice fault con F/A/E prefix
